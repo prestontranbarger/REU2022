@@ -1,12 +1,18 @@
 from base import *
+from sage.modular.etaproducts import qexp_eta
+
 
 def j(c, d, z):
     return c * z + d
 
-def gamma(a, b, c, d, z):
+def gammaOfZ(a, b, c, d, z):
     return (a * z + b) / (c * z + d)
 
-#def dedekindEta(z):
+#def dedekindEta(z, t = 100):
+#    q = e ** (2 * pi * I * z)
+#    p = qexp_eta(ZZ[['x']], t).polynomial()
+#    print(p)
+#    return q ** (1 / 24) * p(x = q)
 
 def dedekindEpsilon(a, b, c, d):
     #computes the dedekind epsilon function of a, b, c, d

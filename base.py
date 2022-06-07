@@ -1,6 +1,7 @@
 from sage.all import *
 
 def cartesianProd(pools):
+  #computes the cartesian product of arrays
   result = [[]]
   for pool in pools:
     result = [x + [y] for x in result for y in pool]
@@ -17,7 +18,6 @@ def totient(n, rf = False):
   else:
     return p
 
-
 def primitiveRoot(n):
   # computes primitive roots if they exist otherwise, returns 0
   tn = totient(n)
@@ -31,3 +31,29 @@ def primitiveRoot(n):
       if flag:
         return g
   return 0
+
+def jacobiSymbol(a, n):
+  #generalized Legendre symbol
+  if n == 1:
+    return [1, True]
+  if n % 2 == 0 or n < 0:
+    return [0, False]
+  if math.gcd(a, n) != 1:
+    return [0, True]
+  else:
+    prod = 1
+    if a < 0:
+      a *= -1
+      if n % 4 == 3:
+        prod *= -1
+    while a > 1:
+      a %= n
+      m = (-1 if (n % 8 == 3 or n % 8 == 5) else 1)
+      while not a % 2:
+        a = a // 2
+        prod *= m
+      if a > 2:
+        if (a - 1) * (n - 1) / 4 % 2:
+          prod *= -1
+        a, n = n, a
+    return [prod, True]
