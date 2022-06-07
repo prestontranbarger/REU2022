@@ -1,5 +1,11 @@
 from sage.all import *
 
+def arrToDict(arr):
+  dict = {}
+  for i in range(len(arr)):
+    dict[i] = arr[i]
+  return dict
+
 def cartesianProd(pools):
   #computes the cartesian product of arrays
   result = [[]]

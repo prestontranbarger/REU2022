@@ -1,12 +1,10 @@
-from base import *
-from sage.modular.etaproducts import qexp_eta
+from dirichletCharacters import *
 
+def j(gamma, z):
+    return gamma[1][0] * z + gamma[1][1]
 
-def j(c, d, z):
-    return c * z + d
-
-def gammaOfZ(a, b, c, d, z):
-    return (a * z + b) / (c * z + d)
+def gammaOfZ(gamma, z):
+    return (gamma[0][0] * z + gamma[0][1]) / (gamma[1][0] * z + gamma[1][1])
 
 #def dedekindEta(z, t = 100):
 #    q = e ** (2 * pi * I * z)
@@ -14,8 +12,9 @@ def gammaOfZ(a, b, c, d, z):
 #    print(p)
 #    return q ** (1 / 24) * p(x = q)
 
-def dedekindEpsilon(a, b, c, d):
+def dedekindEpsilon(gamma):
     #computes the dedekind epsilon function of a, b, c, d
+    a, b, c, d = gamma[0][0], gamma[0][1], gamma[1][0], gamma[1][1]
     if c == 0 and d == 1:
         return e ** (pi * I * b / 12)
     return e ** (pi * I * ((a + d) / (12 * c) - dedekindSum(d, c) - 1 / 4))
@@ -51,4 +50,15 @@ def generalizedDedekindSum(a, b, c):
     sum = 0
     for n in range(c):
         sum += sawtooth(a * n / c) * sawtooth(b * n / c)
+    return sum
+
+def newFormDedekindSum(dChar1, dChar2, gamma):
+    sum = 0
+    q1 = modulus(dChar1)
+    a, c = gamma[0][0], gamma[1][0]
+    dictChar1 = getValuesDict(dChar1)
+    dictChar2 = getValuesDict(dChar2)
+    for j in range(c):
+        for n in range(modulus(dChar1)):
+            sum += dictChar2(j).conjugate() * dictChar1(n).conjugate() * sawtooth(j / c) * sawtooth(n / q1 + a * j / c)
     return sum
