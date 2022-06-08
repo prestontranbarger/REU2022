@@ -63,3 +63,6 @@ def jacobiSymbol(a, n):
           prod *= -1
         a, n = n, a
     return [prod, True]
+
+def gammaFunction(z):
+  return gamma(z)

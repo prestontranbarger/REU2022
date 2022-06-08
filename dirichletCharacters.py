@@ -78,7 +78,7 @@ def isPrimitive(dChar):
 def primitiveCharacter(dChar):
     return dChar.primitive_character()
 
-def gaussSum(a, dChar):
+def gaussSum(dChar, a = 1):
     return dChar.gauss_sum(a)
 
 def getValues(dChar):
@@ -86,3 +86,9 @@ def getValues(dChar):
 
 def getValuesDict(dChar):
     return arrToDict(dChar.values())
+
+def isEven(dChar):
+    return dChar.is_even()
+
+def isOdd(dChar):
+    return dChar.is_odd()

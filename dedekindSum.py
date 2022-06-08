@@ -1,4 +1,5 @@
 from dirichletCharacters import *
+from sage.libs.lcalc.lcalc_Lfunction import *
 
 def j(gamma, z):
     return gamma[1][0] * z + gamma[1][1]
@@ -34,6 +35,8 @@ def sawtooth(x):
     return x - floor(x) - 1 / 2
 
 def dedekindSum(b, c):
+    #computes the standard dedekind sum using reciprocity laws to speed up computation
+    #see: https://en.wikipedia.org/wiki/Dedekind_sum
     sum = 0
     i = 0
     while b != 0 and c != 1:
@@ -44,13 +47,21 @@ def dedekindSum(b, c):
     return sum
 
 def dedekindSumSlow(b, c):
+    # computes the standard dedekind sum
+    # see: https://en.wikipedia.org/wiki/Dedekind_sum
     return generalizedDedekindSum(1, b, c)
 
 def generalizedDedekindSum(a, b, c):
+    # computes the generalized dedekind sum
+    # see: https://en.wikipedia.org/wiki/Dedekind_sum
     sum = 0
     for n in range(c):
         sum += sawtooth(a * n / c) * sawtooth(b * n / c)
     return sum
+
+def psi(dChar1, dChar2, gamma):
+    d = gamma[1][1]
+    return dChar1(d) * dChar2(d).conjugate()
 
 def newFormDedekindSum(dChar1, dChar2, gamma):
     sum = 0
@@ -62,3 +73,30 @@ def newFormDedekindSum(dChar1, dChar2, gamma):
         for n in range(modulus(dChar1)):
             sum += dictChar2(j).conjugate() * dictChar1(n).conjugate() * sawtooth(j / c) * sawtooth(n / q1 + a * j / c)
     return sum
+
+def cdMaxNorm(norm = 10000):
+    pairs = []
+    for c in range(floor(-1 * sqrt(norm)), ceil(sqrt(norm))):
+        for d in range(floor(-1 * sqrt(norm - c ** 2)), ceil(sqrt(norm - c ** 2)) + 1):
+            if gcd(c, d) == 1:
+                pairs.append([c, d])
+    return pairs
+
+def newformEisensteinSeries(dChar1, dChar2, z, s, norm = 10000):
+    if isEven(dChar1) == isEven(dChar2):
+        q1, q2 = modulus(dChar1), modulus(dChar2)
+        sum = 0
+        for pair in cdMaxNorm(norm):
+            c, d = pair[0], pair[1]
+            sum += ((q2 * z.imag()) ** s * dChar1(c) * dChar2(d)) / (c * q2 * z + d) ** (2 * s)
+        return sum / 2
+    return None
+
+def LFunction(s, dChar):
+    return Lfunction_from_character(dChar).value(s)
+
+def completedEisensteinSeries(dChar1, dChar2, z, s, norm = 10000):
+    if isEven(dChar1) == isEven(dChar2):
+        q1, q2 = modulus(dChar1), modulus(dChar2)
+        return ((q2 / pi) ** s / gaussSum(dChar2)) * gammaFunction(s) * LFunction(2 * s, prodDCharacters(dChar1, dChar2)) * newformEisensteinSeries(dChar1, dChar2, z, s, norm)
+    return None
