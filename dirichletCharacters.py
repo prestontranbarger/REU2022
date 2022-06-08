@@ -92,3 +92,6 @@ def isEven(dChar):
 
 def isOdd(dChar):
     return dChar.is_odd()
+
+def conjugateDChar(dChar):
+    return dChar.bar()
