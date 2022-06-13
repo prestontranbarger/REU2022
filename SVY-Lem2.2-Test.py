@@ -4,8 +4,8 @@ from SLTwoZ import *
 
 q1, q2 = 5, 7
 dChars1, dChars2 = allDCharacters(q1), allDCharacters(q2)
-a1, c1 = 11, 5
-a2, c2 = 13, 4
+a1, c1 = 11, 1
+a2, c2 = 13, 1
 gamma1, gamma2 = buildMatrix(a1, c1 * q1 * q2), buildMatrix(a2, c2 * q1 * q2)
 for dChar1 in dChars1:
     for dChar2 in dChars2:

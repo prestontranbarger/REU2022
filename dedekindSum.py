@@ -70,14 +70,11 @@ def generalizedDedekindSum(a, b, c):
 def newFormDedekindSum(dChar1, dChar2, gamma):
     sum = 0
     q1, q2 = modulus(dChar1), modulus(dChar2)
-    a, c = gamma[0][0], gamma[1][0]
-    #print(gamma)
-    for j in range(abs(c)):
+    a, c = gamma[0][0] if gamma[1][0] > 0 else -1 * gamma[0][0],\
+           gamma[1][0] if gamma[1][0] > 0 else -1 * gamma[1][0]
+    for j in range(c):
         for n in range(q1):
-            #print(sum)
             sum += dChar2(j).conjugate() * dChar1(n).conjugate() * sawtooth(j / c) * sawtooth(n / q1 + a * j / c)
-            #print(sum)
-    #print(sum)
     return sum
 
 def cdMaxNorm(norm = 10000):
