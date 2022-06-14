@@ -18,6 +18,14 @@ def contFrac(a, c):
         a, c = c, (-1 * a) % c
     return out
 
+def contFracTwos(p):
+  Ns = {}
+  for k in range(p - 1):
+    for n in range(2, p + 1):
+      if (n * (k + 1) - k) % p == 0:
+        Ns[k] = n
+  return Ns
+
 def buildMatrix(a, c):
     m = matrix.identity(2)
     for pow in contFrac(a, c):
@@ -35,6 +43,13 @@ def inSLTwoZ(m):
 
 def inGammaZero(m, n):
     return inSLTwoZ(m) and (m[1][0] % n == 0)
+
+def gammaZeroPrimeGens(p):
+    gens = [-1 * matrix.identity(2), T ** 1, T ** (-1)]
+    cFTs = contFracTwos(p)
+    for k in range(p - 1):
+        gens.append(S * T ** cFTs[k] * S * (T ** 2 * S) ** k)
+    return gens
 
 def inGammaOne(m, n):
     return inGammaZero(m, n) and (m[0][0] % n == 1) and (m[1][1] % n == 1)
