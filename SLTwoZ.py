@@ -1,9 +1,28 @@
 from base import *
 
-R = matrix(ZZ, [[0, -1], [1, 1]])
+#R = matrix(ZZ, [[0, -1], [1, 1]])
 S = matrix(ZZ, [[0, -1], [1, 0]])
 T = matrix(ZZ, [[1, 1], [0, 1]])
-U = matrix(ZZ, [[1, 0], [1, 1]])
+#U = matrix(ZZ, [[1, 0], [1, 1]])
+
+#def V(p):
+#    pr = primitiveRoot(p)
+#    a, b = pr, pow(pr, p - 2, p)
+#    return S * T ** a * S * T ** b * S * T ** a, a
+
+#def R(mu, v, p):
+#    muStar = (mu * v ** 2 - v) % p
+#    vStar = (-1 * pow(v, p - 2, p)) % p
+#    return T ** mu * S * T ** v * S * T ** (-1 * vStar) * S * T ** (-1 * muStar)
+
+#def gammaPrimeGen(l, mu, v, p):
+#    VMatrix, a = V(p)
+#    s = Mod(v, p).log(Mod(a, p))
+#    lStar = (l + s) % ((p - 1) // 2)
+#    return VMatrix ** l * R(mu, v, p) * VMatrix ** (-lStar)
+
+#def gammaPrimeGens(p):
+#    return [gammaPrimeGen(l, mu, v, p) for v in range(1, p) for mu in range(p) for l in range((p - 3) // 2 + 1)]
 
 def rotateMatrixCW(m):
     return m.transpose() * matrix(ZZ, [[0, 1], [1, 0]])
