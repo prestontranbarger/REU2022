@@ -75,3 +75,22 @@ def inGammaOne(m, n):
 
 def inGamma(m, n):
     return inGammaZero(m, n) and (m[0][1] % n == 1)
+
+def SLTwoZOverGammaZeroGroupAction(p, groupAction = 's'):
+    if groupAction == 's' or groupAction == 'S':
+        outDict = {-1: 0, 0: -1}
+        for i in range(1, p):
+            outDict[i] = (-1 * pow(i, p - 2, p)) % p
+        return outDict
+    elif groupAction == 't' or groupAction == 'T':
+        outDict = {-1: -1}
+        for i in range(p):
+            outDict[i] = (i + 1) % p
+        return outDict
+    else:
+        print("invalid group action: not a generator of SL(2,ZZ)")
+        return -1
+
+#ef SLTwoZOverGammaOneGroupAction(p, groupAction = ''):
+
+#def GammaZeroOverGammaOneGroupAction(p, groupAction = ''):
