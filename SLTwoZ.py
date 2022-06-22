@@ -6,15 +6,26 @@ T = matrix(ZZ, [[1, 1], [0, 1]])
 U = matrix(ZZ, [[1, 0], [1, 1]])
 
 def matrixMod(m, p):
+    #returns a matrix modulo p element wise
     return matrix(ZZ, [[m[0][0] % p, m[0][1] % p], [m[1][0] % p, m[1][1] % p]])
 
 def rotateMatrixCW(m):
+    #rotates a matrix's entries clockwise
     return m.transpose() * matrix(ZZ, [[0, 1], [1, 0]])
 
 def rotateMatrixCCW(m):
+    #rotates a matrix's entries counter-clockwise
     return (m * matrix(ZZ, [[0, 1], [1, 0]])).transpose()
 
+def computeOrder(m):
+    #computes the order of a matrix in SL2Z
+    for k in range(2, 7):
+        if m ** k == matrix.identity(2):
+            return k
+    return -1
+
 def contFrac(a, c):
+    #returns the continuted fraction expansion of a/c
     if c < 0:
         a, c = -1 * a, -1 * c
     out = []
@@ -24,6 +35,7 @@ def contFrac(a, c):
     return out
 
 def TSDecomp(m):
+    #returns the TS decomposition of a matrix
     TS = []
     while m[1][0] != 0:
         exp = -1 * floor(m[0][0] / m[1][0])
@@ -35,35 +47,33 @@ def TSDecomp(m):
     return TS
 
 def buildMatrix(a, c):
+    #builds a matrix with left column [a, c]
     m = matrix.identity(2)
     for pow in contFrac(a, c):
         m = m * T ** pow * S
     return m
 
 def buildMatrixFromCF(cF):
+    #builds a matrix from a specific continued fraction expansion of a/c
     m = matrix.identity(2)
     for pow in cF:
         m = m * T ** pow * S
     return m
 
 def buildMatrixFromTS(tsDecomp):
+    #builds a matrix from a TS decomposition
     m = S ** (2 * tsDecomp[-1])
     for pow in tsDecomp[:-1]:
         m = m * T ** pow * S
     return m * S ** (-1)
 
-def computeOrder(m):
-    for k in range(2, 7):
-        if m ** k == matrix.identity(2):
-            return k
-    return -1
-
 def congSubGroupType(csg):
+    #checks what congruence subgroup an object belongs to
     #works for all p, note that Gamma0(2) and Gamma1(2) are the same
-    if isinstance(csg, type(Gamma0(3))):
-        return '0'
-    elif isinstance(csg, type(Gamma1(3))):
+    if isinstance(csg, type(Gamma1(3))):
         return '1'
+    elif isinstance(csg, type(Gamma0(3))):
+        return '0'
     return 'S'
 
 def inSLTwoZ(m):
@@ -96,17 +106,30 @@ def inGamma(m, n):
 ##########################
 
 def doubleQuotientLemma(reps1, reps2):
+    #given coset representatives of G/H and H/K, computes coset representatives of G/K
     return [rep1 * rep2 for rep1 in reps1 for rep2 in reps2]
 
-# def schreierLemma(G, H, p):
-#    gType, hType = congSubGroupType(G), congSubGroupType(H)
-#    if gType == 'S' and hType == '0':
-#
-#    elif gType == 'S' and hType == '1':
-#
-#    elif gType == '0' and hType == '1':
+def schreierLemma(G, H, p):
+    #given coset representatives of G/H and generators of G, computes generators of H
+    reps = cosetReps(G, H, p)
+    gType = congSubGroupType(G)
+    if gType == '0':
+        gensIn = schreierLemma(SL2Z, Gamma0(p), p)
+    elif gType == 'S':
+        gensIn = [S, T]
+    gensOut = []
+    for rep in reps:
+        for genIn in gensIn:
+            genOut = rep * genIn * findCoset(SL2Z, H, rep * genIn, p) ** -1
+            genOut.set_immutable()
+            gensOut.append(genOut)
+    return list(set(gensOut))
 
 #def reidemeisterRewrite():
+
+#def isSchreierTransversal(transversal):
+
+#def reidemeisterSchreierRewrite():
 
 ###########################
 ##                       ##
@@ -115,12 +138,14 @@ def doubleQuotientLemma(reps1, reps2):
 ###########################
 
 def cosetRepsSLTwoZOverGammaZero(p):
+    #returns a set of coset representatives of SL2Z/Gamma0(p), these representatives form a Schreier transversal
     reps = [matrix.identity(2)]
     for i in range(0, p):
         reps.append(S * T ** i)
     return reps
 
 def cosetRepsGammaZeroOverGammaOne(p):
+    #returns a set of coset representatives of SL2Z/Gamma1(p)
     reps = []
     for i in range(1, p):
         if gcd(i, p) == 1:
@@ -129,9 +154,11 @@ def cosetRepsGammaZeroOverGammaOne(p):
     return reps
 
 def cosetRepsSLTwoZOverGammaOne(p):
+    #returns a set of coset representatives of Gamma0(p)/Gamma1(p)
     return doubleQuotientLemma(cosetRepsGammaZeroOverGammaOne(p), cosetRepsSLTwoZOverGammaZero(p))
 
 def cosetReps(G, H, p):
+    #returns a set of coset representatives of G/H when H<G and G, H are any two of SL2Z, Gamma0(p), or Gamma1(p)
     gType, hType = congSubGroupType(G), congSubGroupType(H)
     if gType == 'S' and hType == '0':
         return cosetRepsSLTwoZOverGammaZero(p)
@@ -142,24 +169,28 @@ def cosetReps(G, H, p):
     return [-1]
 
 def findCosetSLTwoZOverGammaZero(element, p):
+    #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma0(p)
     reps = cosetRepsSLTwoZOverGammaZero(p)
     for rep in reps:
         if inGammaZero(element * rep ** (-1), p):
             return rep
 
-def findCosetGammaZeroOverGammaOne(element, p):
-    reps = cosetRepsGammaZeroOverGammaOne(p)
-    for rep in reps:
-        if inGammaOne(element * rep ** (-1), p):
-            return rep
-
 def findCosetSLTwoZOverGammaOne(element, p):
+    #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma1(p)
     reps = cosetRepsSLTwoZOverGammaOne(p)
     for rep in reps:
         if inGammaOne(element * rep ** (-1), p):
             return rep
 
+def findCosetGammaZeroOverGammaOne(element, p):
+    #given an element in Gamma0(p), this computes the coset representative of the element in Gamma0(p)/Gamma1(p)
+    reps = cosetRepsGammaZeroOverGammaOne(p)
+    for rep in reps:
+        if inGammaOne(element * rep ** (-1), p):
+            return rep
+
 def findCoset(G, H, element, p):
+    #given an element in G, this computes the coset representative of the element in G/H when H<G and G, H are any two of SL2Z, Gamma0(p), or Gamma1(p)
     gType, hType = congSubGroupType(G), congSubGroupType(H)
     if gType == 'S' and hType == '0':
         return findCosetSLTwoZOverGammaZero(element, p)
@@ -169,6 +200,7 @@ def findCoset(G, H, element, p):
         return findCosetGammaZeroOverGammaOne(element, p)
 
 def SLTwoZOverGammaZeroGroupAction(p, groupAction = 'S'):
+    #describes the group action of the generators of SL2Z on the cosets of SL2Z/Gamma0(p)
     if groupAction == 'S':
         outDict = {-1: 0, 0: -1}
         for i in range(1, p):
