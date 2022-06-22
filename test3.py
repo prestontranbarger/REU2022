@@ -1,18 +1,22 @@
 from SLTwoZ import *
 import time
 
-m = T * S * T ** 2 * S * T ** 4 * S * T ** 3 * S
+m = matrix(ZZ, [[ 8, -3],
+                [19, -7]])
+m = matrix(ZZ, [[      52,      19],
+                [23456773, 8570744]])
 print(m)
 
 p = 19
 G = SL2Z
 H = Gamma0(p)
 inHChecker = inGroupChecker(H)
+reps = cosetReps(G, H, p)
 
 bT = time.time()
 tsD = TSDecomp(m)
+tT = time.time() - bT
 reT = TSDecompToRewritingTape(tsD)
-reps = cosetReps(G, H, p)
 reW = reidemeisterSchreierRewriteReps(reps, inHChecker, reT, p)
 
 m = matrix.identity(2)
@@ -20,4 +24,4 @@ for letter in reW:
     print(letter, ",")
     m = m * letter
 print("\nfinal:\n", m)
-print(float(time.time() - bT))
+print(tT)
