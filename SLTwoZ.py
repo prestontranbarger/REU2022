@@ -1,9 +1,10 @@
 from base import *
 
-R = matrix(ZZ, [[0, -1], [1, 1]])
 S = matrix(ZZ, [[0, -1], [1, 0]])
 T = matrix(ZZ, [[1, 1], [0, 1]])
-U = matrix(ZZ, [[1, 0], [1, 1]])
+
+S.set_immutable()
+T.set_immutable()
 
 def matrixMod(m, p):
     #returns a matrix modulo p element wise
@@ -43,8 +44,16 @@ def TSDecomp(m):
         TS.append(-1 * exp)
     pm = int(m[0][0] == 1)
     TS.append((2 * pm - 1) * m[0][1])
-    TS.append(1 - int((-1) ** (len(TS) + pm - 2) == 1))
+    TS.append((len(TS) + pm) % 2)
     return TS
+
+def TSDecompToRewritingTape(TS):
+    tape = [[matrix.identity(2), S ** (2 * TS[-1])]]
+    for i in range(len(TS) - 2):
+        tape.append([tape[-1][0] * tape[-1][1], T ** TS[i]])
+        tape.append([tape[-1][0] * tape[-1][1], S])
+    tape.append([tape[-1][0] * tape[-1][1], T ** TS[-2]])
+    return tape
 
 def buildMatrix(a, c):
     #builds a matrix with left column [a, c]
@@ -60,10 +69,10 @@ def buildMatrixFromCF(cF):
         m = m * T ** pow * S
     return m
 
-def buildMatrixFromTS(tsDecomp):
+def buildMatrixFromTS(TS):
     #builds a matrix from a TS decomposition
-    m = S ** (2 * tsDecomp[-1])
-    for pow in tsDecomp[:-1]:
+    m = S ** (2 * TS[-1])
+    for pow in TS[:-1]:
         m = m * T ** pow * S
     return m * S ** (-1)
 
@@ -92,6 +101,13 @@ def inGamma(m, n):
     #checks if m is in Gamma(n)
     return inGammaOne(m, n) and (m[0][1] % n == 0)
 
+def inGroupChecker(G):
+    if congSubGroupType(G) == '1':
+        return inGammaOne
+    elif congSubGroupType(G) == '0':
+        return inGammaZero
+    return inSLTwoZ
+
 #def gammaZeroPrimeGens(p):
 #    gens = [-1 * matrix.identity(2), T ** 1, T ** (-1)]
 #    cFTs = contFracTwos(p)
@@ -109,7 +125,15 @@ def doubleQuotientLemma(reps1, reps2):
     #given coset representatives of G/H and H/K, computes coset representatives of G/K
     return [rep1 * rep2 for rep1 in reps1 for rep2 in reps2]
 
-def schreierLemma(G, H, p):
+def U(G, H, t, s, p):
+    #given quotient group G/H, this computes the schreier transformation of t, s
+    return t * s * findCoset(G, H, t * s, p) ** -1
+
+def UReps(reps, inHChecker, t, s, p):
+    #given a set of coset representatives of G/H and a method to check if an element is in H, this computes the schreier transformation of t, s
+    return t * s * findCosetReps(reps, inHChecker, t * s, p) ** -1
+
+def schreierLemma(G, H, p, verbose = False):
     #given coset representatives of G/H and generators of G, computes generators of H
     reps = cosetReps(G, H, p)
     gType = congSubGroupType(G)
@@ -117,19 +141,37 @@ def schreierLemma(G, H, p):
         gensIn = schreierLemma(SL2Z, Gamma0(p), p)
     elif gType == 'S':
         gensIn = [S, T]
-    gensOut = []
-    for rep in reps:
-        for genIn in gensIn:
-            genOut = rep * genIn * findCoset(SL2Z, H, rep * genIn, p) ** -1
-            genOut.set_immutable()
-            gensOut.append(genOut)
-    return list(set(gensOut))
+    if verbose:
+        gensOut = {}
+        for rep in reps:
+            for genIn in gensIn:
+                genOut = U(G, H, rep, genIn, p)
+                rep.set_immutable()
+                genOut.set_immutable()
+                gensOut[(rep, genIn)] = genOut
+        return gensOut
+    else:
+        gensOut = []
+        for rep in reps:
+            for genIn in gensIn:
+                genOut = U(G, H, rep, genIn, p)
+                genOut.set_immutable()
+                gensOut.append(genOut)
+        return list(set(gensOut))
+
+#def schreierLemmaReps(G, reps, inHChecker, p, verbose = True):
 
 #def reidemeisterRewrite():
 
 #def isSchreierTransversal(transversal):
 
-#def reidemeisterSchreierRewrite():
+def reidemeisterSchreierRewrite(G, H, rewritingTape, p):
+    #computes a rewritten representation of a word in G as a word in H
+    return [U(G, H, findCoset(G, H, stage[0], p), stage[1], p) for stage in rewritingTape]
+
+def reidemeisterSchreierRewriteReps(reps, inHChecker, rewritingTape, p):
+    #computes a rewritten representation of a word in G as a word in H given coset representatives G/H and a method to check if an element is in H
+    return [UReps(reps, inHChecker, findCosetReps(reps, inHChecker, stage[0], p), stage[1], p) for stage in rewritingTape]
 
 ###########################
 ##                       ##
@@ -198,6 +240,12 @@ def findCoset(G, H, element, p):
         return findCosetSLTwoZOverGammaOne(element, p)
     elif gType == '0' and hType == '1':
         return findCosetGammaZeroOverGammaOne(element, p)
+
+def findCosetReps(reps, inHChecker, element, p):
+    #given a set of coset representatives of G/H and a method to check if an element is in H, this computes the coset representative of the element in G/H
+    for rep in reps:
+        if inHChecker(element * rep ** (-1), p):
+            return rep
 
 def SLTwoZOverGammaZeroGroupAction(p, groupAction = 'S'):
     #describes the group action of the generators of SL2Z on the cosets of SL2Z/Gamma0(p)
