@@ -1,4 +1,5 @@
 from sage.all import *
+from tqdm import tqdm
 
 def arrToDict(arr):
   dict = {}

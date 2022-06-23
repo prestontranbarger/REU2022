@@ -47,13 +47,13 @@ def TSDecomp(m):
     TS.append((len(TS) + pm) % 2)
     return TS
 
-def TSDecompToRewritingTape(TS):
+def TSDecompToRewritingTape(tsd):
     #takes a TS decomposition and creates a rewriting tape for the reidemeister schreier rewrititng process
-    tape = [[matrix.identity(2), S ** (2 * TS[-1])]]
-    for i in range(len(TS) - 2):
-        tape.append([tape[-1][0] * tape[-1][1], T ** TS[i]])
+    tape = [[matrix.identity(2), S ** (2 * tsd[-1])]]
+    for i in range(len(tsd) - 2):
+        tape.append([tape[-1][0] * tape[-1][1], T ** tsd[i]])
         tape.append([tape[-1][0] * tape[-1][1], S])
-    tape.append([tape[-1][0] * tape[-1][1], T ** TS[-2]])
+    tape.append([tape[-1][0] * tape[-1][1], T ** tsd[-2]])
     return tape
 
 def buildMatrix(a, c):
@@ -163,7 +163,7 @@ def schreierLemma(G, H, n, verbose = False):
                 gensOut.append(genOut)
         return list(set(gensOut))
 
-def schreierLemmaReps(G, reps, inHChecker, n, verbose = True):
+def schreierLemmaReps(G, reps, inHChecker, n, verbose = False):
     #given G and a set of coset representatives of G/H and a method to check if an element is in H, this computes the generators of H
     gType = congSubGroupType(G)
     if gType == '0':
@@ -188,17 +188,15 @@ def schreierLemmaReps(G, reps, inHChecker, n, verbose = True):
                 gensOut.append(genOut)
         return list(set(gensOut))
 
-#def reidemeisterRewrite():
-
 #def isSchreierTransversal(transversal):
 
-def reidemeisterSchreierRewrite(G, H, rewritingTape, p):
+def reidemeisterSchreierRewrite(G, H, rewritingTape, n):
     #computes a rewritten representation of a word in G as a word in H
-    return [U(G, H, findCoset(G, H, stage[0], p), stage[1], p) for stage in rewritingTape]
+    return [U(G, H, findCoset(G, H, stage[0], n), stage[1], n) for stage in rewritingTape]
 
-def reidemeisterSchreierRewriteReps(reps, inHChecker, rewritingTape, p):
+def reidemeisterSchreierRewriteReps(reps, inHChecker, rewritingTape, n):
     #computes a rewritten representation of a word in G as a word in H given coset representatives G/H and a method to check if an element is in H
-    return [UReps(reps, inHChecker, findCosetReps(reps, inHChecker, stage[0], p), stage[1], p) for stage in rewritingTape]
+    return [UReps(reps, inHChecker, findCosetReps(reps, inHChecker, stage[0], n), stage[1], n) for stage in rewritingTape]
 
 ###############################
 ###############################
@@ -225,9 +223,9 @@ def findCosetSLTwoZOverGammaZeroPrime(element, p):
 
 def cosetRepsSLTwoZOverGammaZeroPrimePower(p, k):
     #returns a set of coset representatives of SL2Z/Gamma0(p^k), these representatives for a Schreier transversal
-    reps = cosetRepsSLTwoZOverGammaZeroPrime(p)
+    reps = cosetRepsSLTwoZOverGammaZeroPrime(p ** k)
     for i in range(1, p ** (k - 1)):
-        reps.append(S * T ** (i * p) ** S)
+        reps.append(S * T ** (i * p) * S)
     return reps
 
 def findCosetSLTwoZOverGammaZeroPrimePower(element, p, k):

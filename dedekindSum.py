@@ -1,4 +1,5 @@
 from dirichletCharacters import *
+from SLTwoZ import *
 from sage.libs.lcalc.lcalc_Lfunction import *
 
 def j(gamma, z):
@@ -9,12 +10,12 @@ def gammaOfZ(gamma, z):
     #given a matrix gamma in SL2Z, this returns the LFT gamma*z=(az+b)/(cz+d)
     return (gamma[0][0] * z + gamma[0][1]) / (gamma[1][0] * z + gamma[1][1])
 
-def dedekindEta(z, t = 100):
-    #TODO: needs fixing
-    q = e ** (2 * pi * I * z)
-    p = qexp_eta(ZZ[['x']], t).polynomial()
-    print(p)
-    return q ** (1 / 24) * p(x = q)
+#def dedekindEta(z, t = 100):
+#    #TODO: needs fixing
+#    q = e ** (2 * pi * I * z)
+#    p = qexp_eta(ZZ[['x']], t).polynomial()
+#    print(p)
+#    return q ** (1 / 24) * p(x = q)
 
 def dedekindEpsilon(gamma):
     #computes the dedekind epsilon function of a, b, c, d
@@ -81,6 +82,46 @@ def newFormDedekindSum(dChar1, dChar2, gamma):
         for n in range(q1):
             sum += dChar2(j).conjugate() * dChar1(n).conjugate() * sawtooth(j / c) * sawtooth(n / q1 + a * j / c)
     return sum
+
+def newFormDedekindSumNaiveFast(dChar1, dChar2, gamma):
+    # computes the new form dedekind sum of gamma given two primative characters with similar parity
+    # uses naive fast technique developed during 22 REU
+    q1, q2 = modulus(dChar1), modulus(dChar2)
+    pppc = pOppOc(q1 * q2)
+    #if pppc[0] == 'p':
+    #    return newFormDedekindSumNaiveFastPrime(dChar1, dChar2, gamma, pppc[1])
+    #elif pppc[0] == 'q':
+    #    return newFormDedekindSumNaiveFastPrimePower(dChar1, dChar2, gamma, pppc[1][0], pppc[1][1])
+    #TODO: CHANGE IF BELOW TO ELIF ABOVE ONCE PRIME CAPABILITES ARE RESTORED
+    if pppc[0] == 'q':
+        return newFormDedekindSumNaiveFastPrimePower(dChar1, dChar2, gamma, pppc[1][0], pppc[1][1])
+    #elif pppc[0] == 'n':
+    #    return newFormDedekindSumNaiveFastComposite(dChar1, dChar2, gamma, q1 * q2)
+
+#def newFormDedekindSumNaiveFastPrime(dChar1, dChar2, gamma, p):
+#    q1, q2 = modulus(dChar1), modulus(dChar2)
+
+def newFormDedekindSumNaiveFastPrimePower(dChar1, dChar2, gamma, p, k):
+    reps = cosetRepsSLTwoZOverGammaZeroPrimePower(p, k)
+    inHChecker = inGroupChecker(Gamma0(p ** k))
+    word = reidemeisterSchreierRewriteReps(reps, inHChecker, TSDecompToRewritingTape(TSDecomp(gamma)), p ** k)
+    dSp = {}
+    n = len(word)
+    letter = word[-1]
+    letter.set_immutable()
+    if not letter in dSp:
+        dSp[letter] = [newFormDedekindSum(dChar1, dChar2, letter), psiChar(dChar1, dChar2, letter)]
+    sum = dSp[letter][0]
+    for i in tqdm(range(n - 1)):
+        letter = word[n - 2 - i]
+        letter.set_immutable()
+        if not letter in dSp:
+            dSp[letter] = [newFormDedekindSum(dChar1, dChar2, letter), psiChar(dChar1, dChar2, letter)]
+        sum = dSp[letter][0] + dSp[letter][1] * sum
+    return sum
+
+#def newFormDedekindSumNaiveFastComposite(dChar1, dChar2, gamma, n):
+#    q1, q2 = modulus(dChar1), modulus(dChar2)
 
 #def cdMaxNorm(norm = 10000):
 #    pairs = []
