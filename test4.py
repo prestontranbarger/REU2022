@@ -1,5 +1,7 @@
 from base import *
 
-print(factor(60))
-for p in factor(60):
-    print(p[0], p[1])
+for i in range(2, 28):
+    print(i)
+    print(isPrime(i))
+    print(isPrimePower(i))
+    print("\n")

@@ -27,8 +27,21 @@ def totient(n, rf = False):
 def isPrime(n):
   return n in Primes()
 
-#def isPrimePower(n):
-  #f = factor(n)
+def isPrimePower(n):
+  f = factor(n)
+  if len(f) == 1:
+    return [True, f]
+  return [False, f]
+
+def pOppOc(n):
+  [tf, f] = isPrimePower(n)
+  if tf:
+    if isPrime(n):
+      return ['p', f[0][0]]
+    else:
+      return ['q', [f[0][0], f[0][1]]]
+  else:
+    return ['n']
 
 def primitiveRoot(n):
   # computes primitive roots if they exist otherwise, returns 0
