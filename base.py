@@ -24,6 +24,12 @@ def totient(n, rf = False):
   else:
     return p
 
+def isPrime(n):
+  return n in Primes()
+
+#def isPrimePower(n):
+  #f = factor(n)
+
 def primitiveRoot(n):
   # computes primitive roots if they exist otherwise, returns 0
   tn = totient(n)

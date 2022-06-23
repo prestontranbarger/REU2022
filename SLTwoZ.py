@@ -48,6 +48,7 @@ def TSDecomp(m):
     return TS
 
 def TSDecompToRewritingTape(TS):
+    #takes a TS decomposition and creates a rewriting tape for the reidemeister schreier rewrititng process
     tape = [[matrix.identity(2), S ** (2 * TS[-1])]]
     for i in range(len(TS) - 2):
         tape.append([tape[-1][0] * tape[-1][1], T ** TS[i]])
@@ -102,6 +103,7 @@ def inGamma(m, n):
     return inGammaOne(m, n) and (m[0][1] % n == 0)
 
 def inGroupChecker(G):
+    #returns the method which checks if an element belongs to the group corresponding to the parameter
     if congSubGroupType(G) == '1':
         return inGammaOne
     elif congSubGroupType(G) == '0':
@@ -115,11 +117,13 @@ def inGroupChecker(G):
 #        gens.append(S * T ** cFTs[k] * S * (T ** 2 * S) ** k)
 #    return gens
 
-##########################
-##                      ##
-##   IMPORTANT LEMMAS   ##
-##                      ##
-##########################
+############################
+############################
+###                      ###
+###   IMPORTANT LEMMAS   ###
+###                      ###
+############################
+############################
 
 def doubleQuotientLemma(reps1, reps2):
     #given coset representatives of G/H and H/K, computes coset representatives of G/K
@@ -173,21 +177,38 @@ def reidemeisterSchreierRewriteReps(reps, inHChecker, rewritingTape, p):
     #computes a rewritten representation of a word in G as a word in H given coset representatives G/H and a method to check if an element is in H
     return [UReps(reps, inHChecker, findCosetReps(reps, inHChecker, stage[0], p), stage[1], p) for stage in rewritingTape]
 
-###########################
-##                       ##
-##   IMPORTANT METHODS   ##
-##                       ##
-###########################
+###############################
+###############################
+###                         ###
+###   COSET INVESTIGATION   ###
+###                         ###
+###############################
+###############################
 
-def cosetRepsSLTwoZOverGammaZero(p):
+def cosetRepsSLTwoZOverGammaZeroPrime(p):
     #returns a set of coset representatives of SL2Z/Gamma0(p), these representatives form a Schreier transversal
     reps = [matrix.identity(2)]
     for i in range(0, p):
         reps.append(S * T ** i)
     return reps
 
-def cosetRepsGammaZeroOverGammaOne(p):
-    #returns a set of coset representatives of SL2Z/Gamma1(p)
+def cosetRepsSLTwoZOverGammaZeroPrimePower(p, k):
+    #returns a set of coset representatives of SL2Z/Gamma0(p^k), these representatives for a Schreier transversal
+    reps = cosetRepsSLTwoZOverGammaZeroPrime(p)
+    for i in range(1, p ** (k - 1)):
+        reps.append(S * T ** (i * p) ** S)
+    return reps
+
+def cosetRepsSLTwoZOverGammaOnePrime(p):
+    # returns a set of coset representatives of SL2Z/Gamma1(p)
+    return doubleQuotientLemma(cosetRepsSLTwoZOverGammaZeroPrime(p), cosetRepsGammaZeroOverGammaOnePrime(p))
+
+def cosetRepsSLTwoZOverGammaOnePrimePower(p, k):
+    # returns a set of coset representatives of SL2Z/Gamma1(p^k)
+    return doubleQuotientLemma(cosetRepsSLTwoZOverGammaZeroPrimePower(p, k), cosetRepsGammaZeroOverGammaOnePrimePower(p, k))
+
+def cosetRepsGammaZeroOverGammaOnePrime(p):
+    #returns a set of coset representatives of Gamma0(p)/Gamma1(p)
     reps = []
     for i in range(1, p):
         if gcd(i, p) == 1:
@@ -195,19 +216,20 @@ def cosetRepsGammaZeroOverGammaOne(p):
             reps.append(matrix(ZZ, [[i, (i * ii - 1) // p], [p, ii]]))
     return reps
 
-def cosetRepsSLTwoZOverGammaOne(p):
-    #returns a set of coset representatives of Gamma0(p)/Gamma1(p)
-    return doubleQuotientLemma(cosetRepsGammaZeroOverGammaOne(p), cosetRepsSLTwoZOverGammaZero(p))
+def cosetRepsGammaZeroOverGammaOnePrimePower(p, k):
+    #returns a set of coset representatives of Gamma0(p^k)/Gamma1(p^k)
+    return cosetRepsGammaZeroOverGammaOnePrime(p ** k)
 
-def cosetReps(G, H, p):
+
+def cosetRepsPrime(G, H, p):
     #returns a set of coset representatives of G/H when H<G and G, H are any two of SL2Z, Gamma0(p), or Gamma1(p)
     gType, hType = congSubGroupType(G), congSubGroupType(H)
     if gType == 'S' and hType == '0':
-        return cosetRepsSLTwoZOverGammaZero(p)
+        return cosetRepsSLTwoZOverGammaZeroPrime(p)
     elif gType == 'S' and hType == '1':
-        return cosetRepsSLTwoZOverGammaOne(p)
+        return cosetRepsSLTwoZOverGammaOnePrime(p)
     elif gType == '0' and hType == '1':
-        return cosetRepsGammaZeroOverGammaOne(p)
+        return cosetRepsGammaZeroOverGammaOnePrime(p)
     return [-1]
 
 def findCosetSLTwoZOverGammaZero(element, p):
@@ -247,21 +269,29 @@ def findCosetReps(reps, inHChecker, element, p):
         if inHChecker(element * rep ** (-1), p):
             return rep
 
-def SLTwoZOverGammaZeroGroupAction(p, groupAction = 'S'):
-    #describes the group action of the generators of SL2Z on the cosets of SL2Z/Gamma0(p)
-    if groupAction == 'S':
-        outDict = {-1: 0, 0: -1}
-        for i in range(1, p):
-            outDict[i] = (-1 * pow(i, p - 2, p)) % p
-        return outDict
-    elif groupAction == 'T':
-        outDict = {-1: -1}
-        for i in range(p):
-            outDict[i] = (i + 1) % p
-        return outDict
-    else:
-        print("invalid group action: not a generator of SL(2,ZZ)")
-        return -1
+######################################
+######################################
+###                                ###
+###   GROUP ACTION INVESTIGATION   ###
+###                                ###
+######################################
+######################################
+
+#def SLTwoZOverGammaZeroGroupAction(p, groupAction = 'S'):
+#    #describes the group action of the generators of SL2Z on the cosets of SL2Z/Gamma0(p)
+#    if groupAction == 'S':
+#        outDict = {-1: 0, 0: -1}
+#        for i in range(1, p):
+#            outDict[i] = (-1 * pow(i, p - 2, p)) % p
+#        return outDict
+#    elif groupAction == 'T':
+#        outDict = {-1: -1}
+#        for i in range(p):
+#            outDict[i] = (i + 1) % p
+#        return outDict
+#    else:
+#        print("invalid group action: not a generator of SL(2,ZZ)")
+#        return -1
 
 #def SLTwoZOverGammaOneGroupAction(p, groupAction = ''):
 

@@ -15,9 +15,9 @@ reps = cosetReps(G, H, p)
 
 bT = time.time()
 tsD = TSDecomp(m)
-tT = time.time() - bT
 reT = TSDecompToRewritingTape(tsD)
 reW = reidemeisterSchreierRewriteReps(reps, inHChecker, reT, p)
+tT = time.time() - bT
 
 m = matrix.identity(2)
 for letter in reW:
