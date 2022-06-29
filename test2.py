@@ -1,16 +1,30 @@
 from SLTwoZ import *
+import time
 
-q = 2 * 3
+m = buildMatrix(7, 25)
+print(m)
 
+p = 5
 G = SL2Z
-H = Gamma0(q)
+H = Gamma0(p)
 inHChecker = inGroupChecker(H)
-reps, gens, l, s = H.todd_coxeter()
+reps = [matrix.identity(2),
+        T ** 3 * S * T ** 4 * S * T ** 4,
+        T ** 2 * S * T ** 4 * S,
+        T ** 5 * S * T ** 5 * S * T * S * T ** 2 * S,
+        T ** 6 * S * T ** 3 * S,
+        T ** 4 * S * T ** 4 * S * T ** 4 * S * T ** 4 * S * T ** 4]
+#reps = cosetReps(G, H, p)
 
-#for rep in reps:
-#    print(rep, ",")
-#    print(TSDecomp(rep), ",")
-#    print(contFrac(rep[0][0], rep[1][0]), "\n")
+bT = time.time()
+tsD = TSDecomp(m)
+reT = TSDecompToRewritingTape(tsD)
+reW = reidemeisterSchreierRewriteReps(reps, inHChecker, reT, p)
+tT = time.time() - bT
 
-print(findCosetReps(reps, inHChecker, S * T ** 5 * S, q))
-print(S * T ** 2 * S * T)
+m = matrix.identity(2)
+for letter in reW:
+    print(letter, ",")
+    m = m * letter
+print("\nfinal:\n", m)
+print(tT)

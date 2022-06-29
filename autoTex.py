@@ -19,7 +19,7 @@ def schreierGraphSLTwoZOverGammaZero(p, outFilePath, showST = [True, True]):
 
     if showST[0]:
         visitedS = []
-        ls.append(r'\draw[<->] (1) -- node[midway, above] {S} (2);'+ '\n')
+        ls.append(r'\draw [<->] (1) -- node[midway, above] {S} (2);'+ '\n')
         for i in range(1, p):
             if not (i in visitedS):
                 ls.append(r'\draw [<->] (' + str(i + 2) + ') to [out=315, in=225, looseness=1]node[below]{S} (' + str(gaS[i] + 2) + ');'+ '\n')
@@ -31,7 +31,7 @@ def schreierGraphSLTwoZOverGammaZero(p, outFilePath, showST = [True, True]):
         ls.append(r'\draw [->] (1) edge[loop left]node{T} (1);'+ '\n')
         for i in range(0, p - 1):
             if not (i in visitedT):
-                ls.append(r'\draw[->] (' + str(i + 2) + ') -- node[midway, above] {T} (' + str(gaT[i] + 2) + ');'+ '\n')
+                ls.append(r'\draw [->] (' + str(i + 2) + ') -- node[midway, above] {T} (' + str(gaT[i] + 2) + ');'+ '\n')
                 visitedT.append(i)
         ls.append(r'\draw [<-] (2) to [out=300,in=240,looseness=1]node[below]{T} (' + str(p + 1) + ');'+ '\n')
 

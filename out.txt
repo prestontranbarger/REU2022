@@ -7,20 +7,16 @@
 \node[main] (4) [right of=3] {$ST^{2}$};
 \node[main] (5) [right of=4] {$ST^{3}$};
 \node[main] (6) [right of=5] {$ST^{4}$};
-\node[main] (7) [right of=6] {$ST^{5}$};
-\node[main] (8) [right of=7] {$ST^{6}$};
-\draw[<->] (1) -- node[midway, above] {S} (2);
-\draw [<->] (3) to [out=315, in=225, looseness=1]node[below]{S} (8);
-\draw [<->] (4) to [out=315, in=225, looseness=1]node[below]{S} (5);
-\draw [<->] (6) to [out=315, in=225, looseness=1]node[below]{S} (7);
+\draw [<->] (1) -- node[midway, above] {S} (2);
+\draw [<->] (3) to [out=315, in=225, looseness=1]node[below]{S} (6);
+\draw [<->] (4) to [out=315, in=225, looseness=1]node[below]{S} (4);
+\draw [<->] (5) to [out=315, in=225, looseness=1]node[below]{S} (5);
 \draw [->] (1) edge[loop left]node{T} (1);
-\draw[->] (2) -- node[midway, above] {T} (3);
-\draw[->] (3) -- node[midway, above] {T} (4);
-\draw[->] (4) -- node[midway, above] {T} (5);
-\draw[->] (5) -- node[midway, above] {T} (6);
-\draw[->] (6) -- node[midway, above] {T} (7);
-\draw[->] (7) -- node[midway, above] {T} (8);
-\draw [<-] (2) to [out=300,in=240,looseness=1]node[below]{T} (8);
+\draw [->] (2) -- node[midway, above] {T} (3);
+\draw [->] (3) -- node[midway, above] {T} (4);
+\draw [->] (4) -- node[midway, above] {T} (5);
+\draw [->] (5) -- node[midway, above] {T} (6);
+\draw [<-] (2) to [out=300,in=240,looseness=1]node[below]{T} (6);
 \end{tikzpicture}
 }
 \end{center}

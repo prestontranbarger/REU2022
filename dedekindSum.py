@@ -104,7 +104,7 @@ def newFormDedekindSumNaiveFast(dChar1, dChar2, gamma):
 def newFormDedekindSumNaiveFastPrimePower(dChar1, dChar2, gamma, p, k):
     reps = cosetRepsSLTwoZOverGammaZeroPrimePower(p, k)
     inHChecker = inGroupChecker(Gamma0(p ** k))
-    word = reidemeisterSchreierRewriteReps(reps, inHChecker, TSDecompToRewritingTape(TSDecomp(gamma)), p ** k)
+    word = reidemeisterRewriteReps(reps, inHChecker, TSDecompToRewritingTape(TSDecomp(gamma)), p ** k)
     dSp = {}
     n = len(word)
     letter = word[-1]
