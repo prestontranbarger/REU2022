@@ -223,7 +223,18 @@ def PRing(n):
                 elements.append((c, d))
     return elements
 
-#def POneRing(n):
+def POneRing(n):
+    units = []
+    for i in range(n):
+        if gcd(i, n) == 1:
+            units.append(i)
+    pairs = PRing(n)
+    for pair in pairs:
+        for unit in units:
+            new = (pair[0] * unit % n, pair[1] * unit % n)
+            if new in pairs and unit != 1:
+                pairs.remove(new)
+    return pairs
 
 ###############################
 ###############################
@@ -261,11 +272,15 @@ def findCosetSLTwoZOverGammaZeroPrimePower(element, p, k):
     inHChecker = inGroupChecker(Gamma0(p ** k))
     return findCosetReps(reps, inHChecker, element, p ** k)
 
-#def cosetRepsSLTwoZOverGammaZeroComposite(n):
-#    #returns a set of coset representatives of SL2Z/Gamma0(n)
+def cosetRepsSLTwoZOverGammaZeroComposite(n):
+    #returns a set of coset representatives of SL2Z/Gamma0(n)
+    return [projectiveLift(pair[0], pair[1], n) for pair in POneRing(n)]
 
-#def findCosetSLTwoZOverGammaZeroComposite(element, n):
-#    #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma0(n)
+def findCosetSLTwoZOverGammaZeroComposite(element, n):
+    #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma0(n)
+    reps = cosetRepsSLTwoZOverGammaZeroComposite(n)
+    inHChecker = inGroupChecker(Gamma1(n))
+    return findCosetReps(reps, inHChecker, element, n)
 
 def cosetRepsSLTwoZOverGammaZero(n):
     #returns a set of coset representatives of SL2Z/Gamma0(n)
@@ -274,8 +289,8 @@ def cosetRepsSLTwoZOverGammaZero(n):
         return cosetRepsSLTwoZOverGammaZeroPrime(pppc[1])
     elif pppc[0] == 'q':
         return cosetRepsSLTwoZOverGammaZeroPrimePower(pppc[1][0], pppc[1][1])
-    #elif pppc[0] == 'n':
-    #    return cosetREpsSLTwoZOverGammaZeroComposite(n)
+    elif pppc[0] == 'n':
+        return cosetRepsSLTwoZOverGammaZeroComposite(n)
 
 def findCosetSLTwoZOverGammaZero(element, n):
     #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma0(n)
@@ -284,8 +299,8 @@ def findCosetSLTwoZOverGammaZero(element, n):
         return findCosetSLTwoZOverGammaZeroPrime(element, pppc[1])
     elif pppc[0] == 'q':
         return findCosetSLTwoZOverGammaZeroPrimePower(element, pppc[1][0], pppc[1][1])
-    #elif pppc[0] == 'n':
-    #    return findCosetSLTwoZOverGammaZeroComposite(element, n)
+    elif pppc[0] == 'n':
+        return findCosetSLTwoZOverGammaZeroComposite(element, n)
 
 #cosets SL2Z/Gamma1(n)
 
@@ -368,7 +383,7 @@ def findCosetGammaZeroOverGammaOnePrimePower(element, p, k):
 
 def cosetRepsGammaZeroOverGammaOneComposite(n):
     #returns a set of coset representatives of Gamma0(n)/Gamma1(n)
-    return cosetRepsSLTwoZOverGammaZeroPrime(n)
+    return cosetRepsGammaZeroOverGammaOnePrime(n)
 
 def findCosetGammaZeroOverGammaOneComposite(element, n):
     #given an element in Gamma0(n), this computes the coset representative of the element in Gamma0(n)/Gamma1(n)
@@ -441,12 +456,9 @@ def findCosetPrimePower(G, H, element, p, k):
 def cosetRepsComposite(G, H, n):
     #returns a set of coset representatives of G/H when H<G and G, H are any two of SL2Z, Gamma0(n), or Gamma1(n)
     gType, hType = congSubGroupType(G), congSubGroupType(H)
-    #if gType == 'S' and hType == '0':
-    #    return cosetRepsSLTwoZOverGammaZeroComposite(n)
-    #elif gType == 'S' and hType == '1':
-    #    return cosetRepsSLTwoZOverGammaOneComposite(n)
-    #TODO: ONCE SL2Z/GAMMA0(N) IS IMPLEMENTED CHANGE IF STATEMENT BELOW TO ELIF STATEMENT ABOVE
-    if gType == 'S' and hType == '1':
+    if gType == 'S' and hType == '0':
+        return cosetRepsSLTwoZOverGammaZeroComposite(n)
+    elif gType == 'S' and hType == '1':
         return cosetRepsSLTwoZOverGammaOneComposite(n)
     elif gType == '0' and hType == '1':
         return cosetRepsGammaZeroOverGammaOneComposite(n)
@@ -454,12 +466,9 @@ def cosetRepsComposite(G, H, n):
 def findCosetComposite(G, H, element, n):
     #given an element in G, this computes the coset representative of the element in G/H when H<G and G, H are any two of SL2Z, Gamma0(n), or Gamma1(n)
     gType, hType = congSubGroupType(G), congSubGroupType(H)
-    #if gType == 'S' and hType == '0':
-    #    return findCosetSLTwoZOverGammaZeroComposite(element, p, k)
-    #elif gType == 'S' and hType == '1':
-    #    return findCosetSLTwoZOverGammaOneComposite(element, n)
-    #TODO: ONCE SL2Z/GAMMA0(N) IS IMPLEMENTED CHANGE IF STATEMENT BELOW TO ELIF STATEMENT ABOVE
-    if gType == 'S' and hType == '1':
+    if gType == 'S' and hType == '0':
+        return findCosetSLTwoZOverGammaZeroComposite(element, p, k)
+    elif gType == 'S' and hType == '1':
         return findCosetSLTwoZOverGammaOneComposite(element, n)
     elif gType == '0' and hType == '1':
         return findCosetGammaZeroOverGammaOneComposite(element, n)
@@ -471,8 +480,8 @@ def cosetReps(G, H, n):
         return cosetRepsPrime(G, H, pppc[1])
     elif pppc[0] == 'q':
         return cosetRepsPrimePower(G, H, pppc[1][0], pppc[1][1])
-    #elif pppc[0] == 'n':
-    #    return cosetRepsComposite(G, H, n)
+    elif pppc[0] == 'n':
+        return cosetRepsComposite(G, H, n)
 
 def findCoset(G, H, element, n):
     pppc = pOppOc(n)
@@ -487,6 +496,12 @@ def findCosetReps(reps, inHChecker, element, n):
     #given a set of coset representatives of G/H and a method to check if an element is in H, this computes the coset representative of the element in G/H
     for rep in reps:
         if inHChecker(element * rep ** (-1), n):
+            return rep
+
+def findCosetRepsLeft(reps, inHChecker, element, n):
+    #given a set of LEFT coset representatives of G/H and a method to check if an element is in H, this computes the LEFT coset representative of the element in G/H
+    for rep in reps:
+        if inHChecker(rep ** (-1) * element, n):
             return rep
 
 ######################################
@@ -510,7 +525,7 @@ def SLTwoZOverGammaZeroGroupAction(p, groupAction = 'S'):
             outDict[i] = (i + 1) % p
         return outDict
     else:
-        print("invalid group action: not a generator of SL(2,ZZ)")
+        ("invalid group action: not a generator of SL(2,ZZ)")
         return -1
 
 #def SLTwoZOverGammaOneGroupAction(p, groupAction = ''):

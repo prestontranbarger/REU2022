@@ -95,33 +95,110 @@ def newFormDedekindSumNaiveFast(dChar1, dChar2, gamma):
     #TODO: CHANGE IF BELOW TO ELIF ABOVE ONCE PRIME CAPABILITES ARE RESTORED
     if pppc[0] == 'q':
         return newFormDedekindSumNaiveFastPrimePower(dChar1, dChar2, gamma, pppc[1][0], pppc[1][1])
-    #elif pppc[0] == 'n':
-    #    return newFormDedekindSumNaiveFastComposite(dChar1, dChar2, gamma, q1 * q2)
+    elif pppc[0] == 'n':
+        return newFormDedekindSumNaiveFastComposite(dChar1, dChar2, gamma, q1 * q2)
 
 #def newFormDedekindSumNaiveFastPrime(dChar1, dChar2, gamma, p):
-#    q1, q2 = modulus(dChar1), modulus(dChar2)
 
 def newFormDedekindSumNaiveFastPrimePower(dChar1, dChar2, gamma, p, k):
+    n = p ** k
     reps = cosetRepsSLTwoZOverGammaZeroPrimePower(p, k)
-    inHChecker = inGroupChecker(Gamma0(p ** k))
-    word = reidemeisterRewriteReps(reps, inHChecker, TSDecompToRewritingTape(TSDecomp(gamma)), p ** k)
+    inHChecker = inGroupChecker(Gamma0(n))
+    word = reidemeisterRewriteReps(reps, inHChecker, TSDecompToRewritingTape(TSDecomp(gamma)), n)
     dSp = {}
-    n = len(word)
+    l = len(word)
     letter = word[-1]
     letter.set_immutable()
     if not letter in dSp:
         dSp[letter] = [newFormDedekindSum(dChar1, dChar2, letter), psiChar(dChar1, dChar2, letter)]
     sum = dSp[letter][0]
-    for i in tqdm(range(n - 1)):
-        letter = word[n - 2 - i]
+    for i in tqdm(range(l - 1)):
+        letter = word[l - 2 - i]
         letter.set_immutable()
         if not letter in dSp:
             dSp[letter] = [newFormDedekindSum(dChar1, dChar2, letter), psiChar(dChar1, dChar2, letter)]
         sum = dSp[letter][0] + dSp[letter][1] * sum
     return sum
 
-#def newFormDedekindSumNaiveFastComposite(dChar1, dChar2, gamma, n):
-#    q1, q2 = modulus(dChar1), modulus(dChar2)
+def newFormDedekindSumNaiveFastComposite(dChar1, dChar2, gamma, n):
+    reps = cosetRepsSLTwoZOverGammaZeroComposite(n)
+    inHChecker = inGroupChecker(Gamma0(n))
+    word = reidemeisterRewriteReps(reps, inHChecker, TSDecompToRewritingTape(TSDecomp(gamma)), n)
+    dSp = {}
+    l = len(word)
+    letter = word[-1]
+    letter.set_immutable()
+    if not letter in dSp:
+        dSp[letter] = [newFormDedekindSum(dChar1, dChar2, letter), psiChar(dChar1, dChar2, letter)]
+    sum = dSp[letter][0]
+    for i in tqdm(range(l - 1)):
+        letter = word[l - 2 - i]
+        letter.set_immutable()
+        if not letter in dSp:
+            dSp[letter] = [newFormDedekindSum(dChar1, dChar2, letter), psiChar(dChar1, dChar2, letter)]
+        sum = dSp[letter][0] + dSp[letter][1] * sum
+    return sum
+
+def newFormDedekindSumFast(dChar1, dChar2, gamma):
+    # computes the new form dedekind sum of gamma given two primative characters with similar parity
+    # uses fast technique developed during 22 REU
+    q1, q2 = modulus(dChar1), modulus(dChar2)
+    pppc = pOppOc(q1 * q2)
+    #if pppc[0] == 'p':
+    #    return newFormDedekindSumFastPrime(dChar1, dChar2, gamma, pppc[1])
+    #elif pppc[0] == 'q':
+    #    return newFormDedekindSumFastPrimePower(dChar1, dChar2, gamma, pppc[1][0], pppc[1][1])
+    #TODO: CHANGE IF BELOW TO ELIF ABOVE ONCE PRIME CAPABILITES ARE RESTORED
+    if pppc[0] == 'q':
+        return newFormDedekindSumFastPrimePower(dChar1, dChar2, gamma, pppc[1][0], pppc[1][1])
+    elif pppc[0] == 'n':
+        return newFormDedekindSumFastComposite(dChar1, dChar2, gamma, q1 * q2)
+
+#def newFormDedekindSumFastPrime(dChar1, dChar2, gamma, p):
+
+def newFormDedekindSumFastPrimePower(dChar1, dChar2, gamma, p, k):
+    n = p ** k
+    G0G1reps = cosetRepsGammaZeroOverGammaOnePrimePower(p, k)
+    reps = cosetRepsSLTwoZOverGammaOnePrimePower(p, k)
+    inHChecker = inGroupChecker(Gamma1(n))
+    G0G1 = findCosetRepsLeft(G0G1reps, inHChecker, gamma, n)
+    word = reidemeisterRewriteReps(reps, inHChecker, TSDecompToRewritingTape(TSDecomp(gamma)), n)
+    dSp = {}
+    l = len(word)
+    letter = word[-1]
+    letter.set_immutable()
+    if not letter in dSp:
+        dSp[letter] = newFormDedekindSum(dChar1, dChar2, letter)
+    sum = dSp[letter]
+    for i in tqdm(range(l - 1)):
+        letter = word[l - 2 - i]
+        letter.set_immutable()
+        if not letter in dSp:
+            dSp[letter] = newFormDedekindSum(dChar1, dChar2, letter)
+        sum += dSp[letter]
+
+    return newFormDedekindSum(dChar1, dChar2, G0G1) + psiChar(dChar1, dChar2, G0G1) * sum
+
+def newFormDedekindSumFastComposite(dChar1, dChar2, gamma, n):
+    G0G1reps = cosetRepsGammaZeroOverGammaOneComposite(n)
+    reps = cosetRepsSLTwoZOverGammaOneComposite(n)
+    inHChecker = inGroupChecker(Gamma1(n))
+    G0G1 = findCosetRepsLeft(G0G1reps, inHChecker, gamma, n)
+    word = reidemeisterRewriteReps(reps, inHChecker, TSDecompToRewritingTape(TSDecomp(G0G1 ** (-1) * gamma)), n)
+    dSp = {}
+    l = len(word)
+    letter = word[-1]
+    letter.set_immutable()
+    if not letter in dSp:
+        dSp[letter] = newFormDedekindSum(dChar1, dChar2, letter)
+    sum = dSp[letter]
+    for i in tqdm(range(l - 1)):
+        letter = word[l - 2 - i]
+        letter.set_immutable()
+        if not letter in dSp:
+            dSp[letter] = newFormDedekindSum(dChar1, dChar2, letter)
+        sum += dSp[letter]
+    return newFormDedekindSum(dChar1, dChar2, G0G1) + psiChar(dChar1, dChar2, G0G1) * sum
 
 #def cdMaxNorm(norm = 10000):
 #    pairs = []

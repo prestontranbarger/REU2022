@@ -1,6 +1,3 @@
 from SLTwoZ import *
 
-reps = cosetRepsSLTwoZOverGammaOneComposite(6)
-print("reps found")
-for rep in reps:
-    print(rep, ",")
+print(buildMatrix(47, 143))
