@@ -167,6 +167,7 @@ def schreierLemmaReps(G, reps, inHChecker, n, verbose = False):
     #given G and a set of coset representatives of G/H and a method to check if an element is in H, this computes the generators of H
     gType = congSubGroupType(G)
     if gType == '0':
+        #TODO: IMPROVE BY USING SCHREIER LEMMA REPS
         gensIn = schreierLemma(SL2Z, Gamma0(n), n)
     elif gType == 'S':
         gensIn = [S, T]
@@ -279,7 +280,7 @@ def cosetRepsSLTwoZOverGammaZeroComposite(n):
 def findCosetSLTwoZOverGammaZeroComposite(element, n):
     #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma0(n)
     reps = cosetRepsSLTwoZOverGammaZeroComposite(n)
-    inHChecker = inGroupChecker(Gamma1(n))
+    inHChecker = inGroupChecker(Gamma0(n))
     return findCosetReps(reps, inHChecker, element, n)
 
 def cosetRepsSLTwoZOverGammaZero(n):
@@ -292,6 +293,11 @@ def cosetRepsSLTwoZOverGammaZero(n):
     elif pppc[0] == 'n':
         return cosetRepsSLTwoZOverGammaZeroComposite(n)
 
+def cosetRepsSLTwoZOverGammaZeroGeneralized(n):
+    #returns a set of coset representatives of SL2Z/Gamma0(n), uses the projective lift regardless of n
+    #designed to reduce total method calls
+    return [projectiveLift(pair[0], pair[1], n) for pair in POneRing(n)]
+
 def findCosetSLTwoZOverGammaZero(element, n):
     #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma0(n)
     pppc = pOppOc(n)
@@ -301,6 +307,13 @@ def findCosetSLTwoZOverGammaZero(element, n):
         return findCosetSLTwoZOverGammaZeroPrimePower(element, pppc[1][0], pppc[1][1])
     elif pppc[0] == 'n':
         return findCosetSLTwoZOverGammaZeroComposite(element, n)
+
+def findCosetSLTwoZOverGammaZeroGeneralized(element, n):
+    #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma0(n), uses the projective lift regardless of n
+    #designed to reduce total method calls
+    reps = cosetRepsSLTwoZOverGammaZeroGeneralized(n)
+    inHChecker = inGroupChecker(Gamma0(n))
+    return findCosetReps(reps, inHChecker, element, n)
 
 #cosets SL2Z/Gamma1(n)
 
@@ -344,6 +357,11 @@ def cosetRepsSLTwoZOverGammaOne(n):
     elif pppc[0] == 'n':
         return cosetRepsSLTwoZOverGammaOneComposite(n)
 
+def cosetRepsSLTwoZOverGammaOneGeneralized(n):
+    #returns a set of coset representatives of SL2Z/Gamma1(n), uses the projective lift for all n
+    #designed to reduce total method calls
+    return [projectiveLift(pair[0], pair[1], n) for pair in PRing(n)]
+
 def findCosetSLTwoZOverGammaOne(element, n):
     #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma1(n)
     pppc = pOppOc(n)
@@ -353,6 +371,13 @@ def findCosetSLTwoZOverGammaOne(element, n):
         return findCosetSLTwoZOverGammaOnePrimePower(element, pppc[1][0], pppc[1][1])
     elif pppc[0] == 'n':
         return findCosetSLTwoZOverGammaOneComposite(element, n)
+
+def findCosetRepsSLTwoZOverGammaOneGeneralized(n):
+    #given an element in SL2Z, this computes the coset representative of the element in SL2Z/Gamma1(n), uses the projective lift for all n
+    #designed to reduce total method calls
+    reps = cosetRepsSLTwoZOverGammaOneGeneralized(n)
+    inHChecker = inGroupChecker(Gamma1(n))
+    return findCosetReps(reps, inHChecker, element, n)
 
 #cosets Gamma0(n)/Gamma1(n)
 
@@ -401,6 +426,16 @@ def cosetRepsGammaZeroOverGammaOne(n):
     elif pppc[0] == 'n':
         return cosetRepsGammaZeroOverGammaOneComposite(n)
 
+def cosetRepsGammaZeroOverGammaOneGeneralized(n):
+    #returns a set of coset representatives of Gamma0(n)/Gamma1(n)
+    #designed to reduce total method calls
+    reps = []
+    for i in range(1, p):
+        if gcd(i, p) == 1:
+            ii = inverse_mod(i, p)
+            reps.append(matrix(ZZ, [[i, (i * ii - 1) // p], [p, ii]]))
+    return reps
+
 def findCosetGammaZeroOverGammaOne(element, n):
     #given an element in Gamma0(n), this computes the coset representative of the element in Gamma0(n)/Gamma1(n)
     pppc = pOppOc(n)
@@ -410,6 +445,13 @@ def findCosetGammaZeroOverGammaOne(element, n):
         return findCosetGammaZeroOverGammaOnePrimePower(element, pppc[1][0], pppc[1][1])
     elif pppc[0] == 'n':
         return findCosetGammaZeroOverGammaOneComposite(element, n)
+
+def findCosetGammaZeroOverGammaOneGeneralized(element, n):
+    #given an element in Gamma0(n), this computes the coset representative of the element in Gamma0(n)/Gamma1(n)
+    #designed to reduce total method calls
+    reps = cosetRepsGammaZeroOverGammaOneGeneralized(n)
+    inHChecker = inGroupChecker(Gamma1(n))
+    return findCosetReps(reps, inHChecker, element, n)
 
 #general cosets
 

@@ -1,5 +1,7 @@
 from dirichletCharacters import *
 from SLTwoZ import *
+from precomputation import *
+
 from sage.libs.lcalc.lcalc_Lfunction import *
 
 def j(gamma, z):
@@ -80,7 +82,7 @@ def newFormDedekindSum(dChar1, dChar2, gamma):
            gamma[1][0] if gamma[1][0] > 0 else -1 * gamma[1][0]
     for j in range(c):
         for n in range(q1):
-            sum += dChar2(j).conjugate() * dChar1(n).conjugate() * sawtooth(j / c) * sawtooth(n / q1 + a * j / c)
+            sum += dChar2(j).conjugate() * dChar1(n).conjugate() * (sawtooth(j / c) + 0 * I) * (sawtooth(n / q1 + a * j / c) + 0 * I)
     return sum
 
 def newFormDedekindSumNaiveFast(dChar1, dChar2, gamma):
@@ -138,6 +140,8 @@ def newFormDedekindSumNaiveFastComposite(dChar1, dChar2, gamma, n):
             dSp[letter] = [newFormDedekindSum(dChar1, dChar2, letter), psiChar(dChar1, dChar2, letter)]
         sum = dSp[letter][0] + dSp[letter][1] * sum
     return sum
+
+#def newFormDedekindSumNaiveUltraFast(dChar1, dChar2, gamma):
 
 def newFormDedekindSumFast(dChar1, dChar2, gamma):
     # computes the new form dedekind sum of gamma given two primative characters with similar parity
@@ -199,6 +203,8 @@ def newFormDedekindSumFastComposite(dChar1, dChar2, gamma, n):
             dSp[letter] = newFormDedekindSum(dChar1, dChar2, letter)
         sum += dSp[letter]
     return newFormDedekindSum(dChar1, dChar2, G0G1) + psiChar(dChar1, dChar2, G0G1) * sum
+
+#def newFormDedekindSumUltraFast(dChar1, dChar2, gamma):
 
 #def cdMaxNorm(norm = 10000):
 #    pairs = []
