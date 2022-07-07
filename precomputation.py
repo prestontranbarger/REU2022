@@ -9,6 +9,13 @@ from os.path import isdir
 gensWritePath = "/precomputation"
 charWritePath = "/precomputation"
 
+def modPairs(N):
+    pairs = []
+    for j in range(3, N // 3 + 1):
+        for k in range(3, N // j + 1):
+            pairs.append((j, k))
+    return pairs
+
 def dCharString(dChar):
     l = str(dChar).split()
     out = l[3] + "c" + l[6] + ";"
@@ -64,12 +71,14 @@ def precomputeGensGammaOne(n):
 def precomputeCharacterPairs(dChar1, dChar2):
     q1q2 = modulus(dChar1) * modulus(dChar2)
     subPath, (G0Path, G1Path) = createCharacterPairFiles(dChar1, dChar2)
-    f = open(G0Path, "w")
-    f.writelines([matrixString(gen) + complexString(newFormDedekindSum(dChar1, dChar2, gen)) + "\n" for gen in tqdm(precomputeGensGammaZero(q1q2))])
-    f.close()
-    f = open(G1Path, "w")
-    f.writelines([matrixString(gen) + complexString(newFormDedekindSum(dChar1, dChar2, gen))+ "\n" for gen in tqdm(precomputeGensGammaOne(q1q2))])
-    f.close()
+    if not os.path.exists(G0Path):
+        f = open(G0Path, "w")
+        f.writelines([matrixString(gen) + complexString(newFormDedekindSum(dChar1, dChar2, gen)) + "\n" for gen in tqdm(precomputeGensGammaZero(q1q2))])
+        f.close()
+    if not os.path.exists(G1Path):
+        f = open(G1Path, "w")
+        f.writelines([matrixString(gen) + complexString(newFormDedekindSum(dChar1, dChar2, gen))+ "\n" for gen in tqdm(precomputeGensGammaOne(q1q2))])
+        f.close()
 
 def createCharacterPairFiles(dChar1, dChar2):
     q1q2 = modulus(dChar1) * modulus(dChar2)
