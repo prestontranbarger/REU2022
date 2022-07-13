@@ -71,11 +71,11 @@ def precomputeGensGammaOne(n):
 def precomputeCharacterPairs(dChar1, dChar2):
     q1q2 = modulus(dChar1) * modulus(dChar2)
     subPath, (G0Path, G1Path) = createCharacterPairFiles(dChar1, dChar2)
-    if not os.path.exists(G0Path):
+    if G0Path != True:
         f = open(G0Path, "w")
         f.writelines([matrixString(gen) + complexString(newFormDedekindSum(dChar1, dChar2, gen)) + "\n" for gen in tqdm(precomputeGensGammaZero(q1q2))])
         f.close()
-    if not os.path.exists(G1Path):
+    if G1Path != True:
         f = open(G1Path, "w")
         f.writelines([matrixString(gen) + complexString(newFormDedekindSum(dChar1, dChar2, gen))+ "\n" for gen in tqdm(precomputeGensGammaOne(q1q2))])
         f.close()
@@ -107,8 +107,50 @@ def createCharacterPairFiles(dChar1, dChar2):
     G0Path,\
     G1Path = subPath + "G0-" + str(q1q2) + ".chpr",\
              subPath + "G1-" + str(q1q2) + ".chpr"
-    f = open(G0Path, "w")
-    f.close()
-    f = open(G1Path, "w")
-    f.close()
+    if not os.path.exists(G0Path):
+        f = open(G0Path, "w")
+        f.close()
+    else:
+        G0Path = True
+    if not os.path.exists(G1Path):
+        f = open(G1Path, "w")
+        f.close()
+    else:
+        G1Path = True
     return subPath, (G0Path, G1Path)
+
+def chprPathFinder(dChar1, dChar2):
+    q1q2 = modulus(dChar1) * modulus(dChar2)
+    str1, str2 = dCharString(dChar1), dCharString(dChar2)
+    subPath = os.getcwd() + gensWritePath + \
+              str("/characterPairs/") + \
+              str1.split("c")[0] + "/" + \
+              str1.split(";")[0].split("c")[1] + "/" + \
+              str1.split(";")[1] + "/" + \
+              str2.split("c")[0] + "/" + \
+              str2.split(";")[0].split("c")[1] + "/" + \
+              str2.split(";")[1] + "/"
+    G0Path, \
+    G1Path = subPath + "G0-" + str(q1q2) + ".chpr", \
+             subPath + "G1-" + str(q1q2) + ".chpr"
+    return G0Path, G1Path
+
+def readGens(path):
+    f = open(path, 'r')
+    gens = [line[:-1] for line in f.readlines()]
+    f.close()
+    return gens
+
+def readAllChpr(path):
+    dict = {}
+    f = open(path, 'r')
+    for line in f.readlines():
+        splitted = line[:-1].split(":")
+        dict[splitted[0] + ":"] = stringComplex(splitted[1])
+    f.close()
+    return dict
+
+def readMatrixChpr(m, path):
+    s = matrixString(m)
+    dict = readAllChpr(path)
+    return dict[s]

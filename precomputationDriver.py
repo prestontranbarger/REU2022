@@ -1,7 +1,7 @@
 from precomputation import *
 
 N = 50
-for pair in modPairs(N)
+for pair in modPairs(N):
     for dChar1 in allDCharacters(pair[0]):
         for dChar2 in allDCharacters(pair[1]):
             if isEven(dChar1) == isEven(dChar2):
