@@ -200,6 +200,10 @@ def reidemeisterRewriteReps(reps, inHChecker, rewritingTape, n):
     return [UReps(reps, inHChecker, findCosetReps(reps, inHChecker, stage[0], n), stage[1], n) for stage in rewritingTape]
 
 def projectiveLift(c, d, N):
+    if c == 0 and d == 1:
+        return matrix(ZZ, [[1, 0],
+                           [0, 1]])
+
     if c != 0 and d != 0:
         while gcd(c, d) != 1:
             d += N
