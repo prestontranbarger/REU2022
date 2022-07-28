@@ -26,9 +26,9 @@ from base import *
 #        dChar[i] = dChar1[i % ld1] * dChar2[i % ld2]
 #    return dChar
 
-def prodDCharacters(dChar1, dChar2):
-    G = DirichletGroup(lcm(modulus(dChar1), modulus(dChar2)))
-    return G(dChar1) * G(dChar2)
+# def prodDCharacters(dChar1, dChar2):
+#     G = DirichletGroup(lcm(modulus(dChar1), modulus(dChar2)))
+#     return G(dChar1) * G(dChar2)
 
 #def allDCharacters(n):
 #    #computes all dirichlet characters for a given modulus
@@ -66,32 +66,32 @@ def allDCharacters(n):
 def modulus(dChar):
     return dChar.modulus()
 
-def conductor(dChar):
-    return dChar.conductor()
+# def conductor(dChar):
+#     return dChar.conductor()
 
-def isTrivial(dChar):
-    return dChar.is_trivial()
+# def isTrivial(dChar):
+#     return dChar.is_trivial()
 
 def isPrimitive(dChar):
     return dChar.is_primitive()
 
-def primitiveCharacter(dChar):
-    return dChar.primitive_character()
+# def primitiveCharacter(dChar):
+#     return dChar.primitive_character()
 
-def gaussSum(dChar, a = 1):
-    return dChar.gauss_sum(a)
+# def gaussSum(dChar, a = 1):
+#     return dChar.gauss_sum(a)
 
-def getValues(dChar):
-    return dChar.values()
+# def getValues(dChar):
+#     return dChar.values()
 
-def getValuesDict(dChar):
-    return arrToDict(dChar.values())
+# def getValuesDict(dChar):
+#     return arrToDict(dChar.values())
 
 def isEven(dChar):
     return dChar.is_even()
 
-def isOdd(dChar):
-    return dChar.is_odd()
+# def isOdd(dChar):
+#     return dChar.is_odd()
 
-def conjugateDChar(dChar):
-    return dChar.bar()
+# def conjugateDChar(dChar):
+#     return dChar.bar()

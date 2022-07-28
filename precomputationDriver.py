@@ -1,6 +1,6 @@
 from precomputation import *
 
-N = 50
+N = 30
 for pair in modPairs(N):
     for dChar1 in allDCharacters(pair[0]):
         for dChar2 in allDCharacters(pair[1]):

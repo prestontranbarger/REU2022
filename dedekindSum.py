@@ -2,15 +2,15 @@ from dirichletCharacters import *
 from SLTwoZ import *
 from precomputation import *
 
-from sage.libs.lcalc.lcalc_Lfunction import *
+# from sage.libs.lcalc.lcalc_Lfunction import *
 
-def j(gamma, z):
-    #given a matrix gamma in SL2Z, this returns j(z)=c*z+d
-    return gamma[1][0] * z + gamma[1][1]
+# def j(gamma, z):
+#     #given a matrix gamma in SL2Z, this returns j(z)=c*z+d
+#     return gamma[1][0] * z + gamma[1][1]
 
-def gammaOfZ(gamma, z):
-    #given a matrix gamma in SL2Z, this returns the LFT gamma*z=(az+b)/(cz+d)
-    return (gamma[0][0] * z + gamma[0][1]) / (gamma[1][0] * z + gamma[1][1])
+# def gammaOfZ(gamma, z):
+#     #given a matrix gamma in SL2Z, this returns the LFT gamma*z=(az+b)/(cz+d)
+#     return (gamma[0][0] * z + gamma[0][1]) / (gamma[1][0] * z + gamma[1][1])
 
 #def dedekindEta(z, t = 100):
 #    #TODO: needs fixing
@@ -19,20 +19,20 @@ def gammaOfZ(gamma, z):
 #    print(p)
 #    return q ** (1 / 24) * p(x = q)
 
-def dedekindEpsilon(gamma):
-    #computes the dedekind epsilon function of a, b, c, d
-    a, b, c, d = gamma[0][0], gamma[0][1], gamma[1][0], gamma[1][1]
-    if c == 0 and d == 1:
-        return e ** (pi * I * b / 12)
-    return e ** (pi * I * ((a + d) / (12 * c) - dedekindSum(d, c) - 1 / 4))
+# def dedekindEpsilon(gamma):
+#     #computes the dedekind epsilon function of a, b, c, d
+#     a, b, c, d = gamma[0][0], gamma[0][1], gamma[1][0], gamma[1][1]
+#     if c == 0 and d == 1:
+#         return e ** (pi * I * b / 12)
+#     return e ** (pi * I * ((a + d) / (12 * c) - dedekindSum(d, c) - 1 / 4))
 
-def partition(n):
-    #computes the number of partitions of [0, 1, ..., n], returns [p(0), p(1), ..., p(n)]
-    parts = [1] + [0] * n
-    for t in range(1, n + 1):
-        for i, x in enumerate(range(t, n + 1)):
-            parts[x] += parts[i]
-    return parts
+# def partition(n):
+#     #computes the number of partitions of [0, 1, ..., n], returns [p(0), p(1), ..., p(n)]
+#     parts = [1] + [0] * n
+#     for t in range(1, n + 1):
+#         for i, x in enumerate(range(t, n + 1)):
+#             parts[x] += parts[i]
+#     return parts
 
 def sawtooth(x):
     #sawtooth function
@@ -40,38 +40,38 @@ def sawtooth(x):
         return 0
     return x - floor(x) - 1 / 2
 
-def psiChar(dChar1, dChar2, gamma):
-    #given two characters and a matrix dChar1, dChar2, and gamma respectively, this returns dChar1(d)*conjugate(dChar2(d))
-    d = gamma[1][1]
-    return dChar1(d) * dChar2(d).conjugate()
+# def psiChar(dChar1, dChar2, gamma):
+#     #given two characters and a matrix dChar1, dChar2, and gamma respectively, this returns dChar1(d)*conjugate(dChar2(d))
+#     d = gamma[1][1]
+#     return dChar1(d) * dChar2(d).conjugate()
 
-def LFunction(s, dChar):
-    return Lfunction_from_character(dChar).value(s)
+# def LFunction(s, dChar):
+#     return Lfunction_from_character(dChar).value(s)
 
-def dedekindSum(b, c):
-    #computes the standard dedekind sum using reciprocity laws to speed up computation
-    #see: https://en.wikipedia.org/wiki/Dedekind_sum
-    sum = 0
-    i = 0
-    while b != 0 and c != 1:
-        b %= c
-        sum += (-1) ** i * ((b ** 2 + c ** 2 + 1) / (12 * b * c) - 1 / 4)
-        b, c = c, b
-        i += 1
-    return sum
-
-def dedekindSumSlow(b, c):
-    # computes the standard dedekind sum
-    # see: https://en.wikipedia.org/wiki/Dedekind_sum
-    return generalizedDedekindSum(1, b, c)
-
-def generalizedDedekindSum(a, b, c):
-    # computes the generalized dedekind sum
-    # see: https://en.wikipedia.org/wiki/Dedekind_sum
-    sum = 0
-    for n in range(c):
-        sum += sawtooth(a * n / c) * sawtooth(b * n / c)
-    return sum
+# def dedekindSum(b, c):
+#     #computes the standard dedekind sum using reciprocity laws to speed up computation
+#     #see: https://en.wikipedia.org/wiki/Dedekind_sum
+#     sum = 0
+#     i = 0
+#     while b != 0 and c != 1:
+#         b %= c
+#         sum += (-1) ** i * ((b ** 2 + c ** 2 + 1) / (12 * b * c) - 1 / 4)
+#         b, c = c, b
+#         i += 1
+#     return sum
+#
+# def dedekindSumSlow(b, c):
+#     # computes the standard dedekind sum
+#     # see: https://en.wikipedia.org/wiki/Dedekind_sum
+#     return generalizedDedekindSum(1, b, c)
+#
+# def generalizedDedekindSum(a, b, c):
+#     # computes the generalized dedekind sum
+#     # see: https://en.wikipedia.org/wiki/Dedekind_sum
+#     sum = 0
+#     for n in range(c):
+#         sum += sawtooth(a * n / c) * sawtooth(b * n / c)
+#     return sum
 
 def newFormDedekindSum(dChar1, dChar2, gamma):
     #computes the new form dedekind sum of gamma given two primative characters with similar parity
@@ -107,24 +107,24 @@ def newFormDedekindSum(dChar1, dChar2, gamma):
 #                 sum += dChar2(j).conjugate() * dChar1(n).conjugate() * (sawtooth(j / c) + 0 * I) * (sawtooth(n / q1 + a * j / c) + 0 * I)
 #     return sum
 
-def newFormDedekindSumFast(dChar1, dChar2, gamma):
-    n = modulus(dChar1) * modulus(dChar2)
-    repsDict, gRepsDict = cosetRepsSLTwoZOverGammaOneFast(n), cosetRepsGammaZeroOverGammaOneFast(n)
-    g = gRepsDict[gamma[1][1] % n]
-    m = gamma * g ** (-1)
-    rwt, sum = TSDecompToRewritingTape(TSDecomp(m)), newFormDedekindSum(dChar1, dChar2, g)
-    for i in tqdm(range(0, len(rwt), 2)):
-        cosetRep1, cosetRep2, a = repsDict[(rwt[i][0][1][0] % n, rwt[i][0][1][1] % n)],\
-                                  repsDict[(rwt[i + 1][0][1][0] % n, rwt[i + 1][0][1][1] % n)],\
-                                  int(rwt[i][1][0][1])
-        q, r = a // n, a % n
-        cosetRep1n, cosetRep1r, cosetRep2t = cosetRep1 * T ** n, cosetRep1 * T ** r, cosetRep2 * rwt[i + 1][1]
-        sum += newFormDedekindSum(dChar1, dChar2, cosetRep1n * repsDict[(cosetRep1n[1][0] % n, cosetRep1n[1][1] % n)] ** (-1)) * q +\
-               newFormDedekindSum(dChar1, dChar2, cosetRep1r * repsDict[(cosetRep1r[1][0] % n, cosetRep1r[1][1] % n)] ** (-1)) +\
-               newFormDedekindSum(dChar1, dChar2, cosetRep2t * repsDict[(cosetRep2t[1][0] % n, cosetRep2t[1][1] % n)] ** (-1))
-    return sum
+# def newFormDedekindSumFast(dChar1, dChar2, gamma):
+#     n = modulus(dChar1) * modulus(dChar2)
+#     repsDict, gRepsDict = cosetRepsSLTwoZOverGammaOneFast(n), cosetRepsGammaZeroOverGammaOneFast(n)
+#     g = gRepsDict[gamma[1][1] % n]
+#     m = gamma * g ** (-1)
+#     rwt, sum = TSDecompToRewritingTape(TSDecomp(m)), newFormDedekindSum(dChar1, dChar2, g)
+#     for i in tqdm(range(0, len(rwt), 2)):
+#         cosetRep1, cosetRep2, a = repsDict[(rwt[i][0][1][0] % n, rwt[i][0][1][1] % n)],\
+#                                   repsDict[(rwt[i + 1][0][1][0] % n, rwt[i + 1][0][1][1] % n)],\
+#                                   int(rwt[i][1][0][1])
+#         q, r = a // n, a % n
+#         cosetRep1n, cosetRep1r, cosetRep2t = cosetRep1 * T ** n, cosetRep1 * T ** r, cosetRep2 * rwt[i + 1][1]
+#         sum += newFormDedekindSum(dChar1, dChar2, cosetRep1n * repsDict[(cosetRep1n[1][0] % n, cosetRep1n[1][1] % n)] ** (-1)) * q +\
+#                newFormDedekindSum(dChar1, dChar2, cosetRep1r * repsDict[(cosetRep1r[1][0] % n, cosetRep1r[1][1] % n)] ** (-1)) +\
+#                newFormDedekindSum(dChar1, dChar2, cosetRep2t * repsDict[(cosetRep2t[1][0] % n, cosetRep2t[1][1] % n)] ** (-1))
+#     return sum
 
-def newFormDedekindSumFastPrecompute(dChar1, dChar2, gamma, chprPath):
+def newFormDedekindSumFast(dChar1, dChar2, gamma, chprPath):
     n = modulus(dChar1) * modulus(dChar2)
     repsDict, gRepsDict = cosetRepsSLTwoZOverGammaOneFast(n), cosetRepsGammaZeroOverGammaOneFast(n)
     g = gRepsDict[gamma[1][1] % n]

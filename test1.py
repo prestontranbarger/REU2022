@@ -20,7 +20,5 @@ print(isPrimitive(dChar2))
 
 oneHS = newFormDedekindSum(dChar1, dChar2, m)
 print(float(oneHS.real()) + float(oneHS.imag()) * I)
-twoHS = newFormDedekindSumFast(dChar1, dChar2, m)
+twoHS = newFormDedekindSumFast(dChar1, dChar2, m, chprPathFinder(dChar1, dChar2))
 print(float(twoHS.real()) + float(twoHS.imag()) * I)
-threeHS = newFormDedekindSumFastPrecompute(dChar1, dChar2, m, chprPathFinder(dChar1, dChar2))
-print(float(threeHS.real()) + float(threeHS.imag()) * I)
